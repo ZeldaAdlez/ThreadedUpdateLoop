@@ -1,7 +1,6 @@
 package loopSystem;
 
 import loopSystem.interfaces.JobSystem;
-
 import java.util.Hashtable;
 import java.util.Vector;
 
@@ -10,9 +9,9 @@ public class SynchronizedLoop extends ThreadedLoop
     int currentThread = 0;
     final Hashtable<Integer, Vector<JobSystem>> subLoops;
 
-    public SynchronizedLoop(int threadCount)
+    public SynchronizedLoop(int threadCount) throws IllegalArgumentException
     {
-        super(threadCount); // should probably check that threadCount is a valid value
+        super(threadCount); // internally checks if threadCount is less or equal to zero and throws if so
         subLoops = new Hashtable<>();
         for (int i = 0; i < threadCount; i++)
             subLoops.put(i,new Vector<>());
@@ -44,13 +43,13 @@ public class SynchronizedLoop extends ThreadedLoop
 
     public void update()
     {
-        for (Integer key : subLoops.keySet()) // iterate over all subloops
+        for (Integer key : subLoops.keySet()) // iterate over all sub loops
         {
             System.out.println("Printing set " + key);
             int j = 0;
             while (j <= subLoops.get(key).size() - 1)
             {
-                Thread thread = new Thread(subLoops.get(key).get(j)); // grab the jth job from the ith loop
+                Thread thread = new Thread(subLoops.get(key).get(j)); // grab the current job from the current subLoop
                 thread.start();
                 try
                 {

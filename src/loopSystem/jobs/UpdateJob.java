@@ -10,7 +10,7 @@ import java.util.concurrent.Executors;
 public class UpdateJob extends ThreadedLoop
         implements JobSystem
 {
-    final Vector<JobSystem> jobs;
+    Vector<JobSystem> jobs; // Technically due to this things design you can have infinite recursion, neat! :)
     final ExecutorService pool;
 
     public UpdateJob(int threadCount)
@@ -24,7 +24,32 @@ public class UpdateJob extends ThreadedLoop
     {
         jobs.add(system);
     }
-
+    public void addJobs(Vector<JobSystem> jobSystems)
+    {
+        if(jobSystems == null || jobSystems.size() == 0)
+            return;
+        int size = jobs.size() + jobSystems.size() + 1;
+        Vector<JobSystem> newSystem = new Vector<>(size);
+        newSystem.addAll(jobs);
+        newSystem.addAll(jobSystems);
+        jobs = newSystem;
+    }
+    public void addJobs(JobSystem[] jobSystems)
+    {
+        if(jobSystems == null || jobSystems.length == 0)
+            return;
+        int size = jobs.size() + jobSystems.length + 1;
+        Vector<JobSystem> newSystem = new Vector<>(size);
+        newSystem.addAll(jobs);
+        for (int i = 0; i < jobSystems.length; i++)
+        {
+            JobSystem system = jobSystems[i];
+            if(system == null)
+                continue;
+            newSystem.add(system);
+        }
+        jobs = newSystem;
+    }
     public void removeJob(JobSystem job)
     {
         jobs.remove(job);
@@ -46,8 +71,6 @@ public class UpdateJob extends ThreadedLoop
     public void update()
     {
         for (JobSystem job : jobs)
-        {
             pool.execute(job);
-        }
     }
 }

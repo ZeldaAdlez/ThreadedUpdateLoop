@@ -1,19 +1,18 @@
 package loopSystem;
 
 import loopSystem.jobs.UpdateJob;
-
 import java.util.Vector;
 
 public class UpdateManager extends ThreadedLoop
 {
-    final Vector<UpdateJob> loops;
+    final Vector<UpdateJob> loopNodes;
 
     public UpdateManager(int threadCount, int loopCount)
     {
         super(threadCount);
-        loops = new Vector<>(loopCount);
-        for (int i = 0; i < loops.capacity(); i++)
-            loops.add(new UpdateJob(threadCount));
+        loopNodes = new Vector<>(loopCount);
+        for (int i = 0; i < loopNodes.capacity(); i++)
+            loopNodes.add(new UpdateJob(this.threadCount));
     }
 
     @Override
@@ -25,14 +24,25 @@ public class UpdateManager extends ThreadedLoop
     @Override
     public void update()
     {
-        for(UpdateJob loopSystem : loops) // these should ideally run sequentially
-        {
+        for(UpdateJob loopSystem : loopNodes) // these should ideally run sequentially, they do not
             loopSystem.update();
-        }
     }
-
-    public void addJob()
+    public void addLoopNode(UpdateJob job) { loopNodes.add(job); }
+    public void insertLoopNode(UpdateJob job, int index)
     {
-
+        if(index < 0 || index > loopNodes.size())
+            throw new IndexOutOfBoundsException("Index was out of range! " + index);
+        loopNodes.insertElementAt(job, index);
+    }
+    public void pushLoopNode(UpdateJob job)
+    {
+        loopNodes.insertElementAt(job,0);
+    }
+    public UpdateJob popLoopNode()
+    {
+        int lastIndex = loopNodes.size() - 1;
+        UpdateJob job = loopNodes.elementAt(lastIndex);
+        loopNodes.remove(lastIndex);
+        return job;
     }
 }
