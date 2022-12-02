@@ -25,7 +25,18 @@ public class UpdateManager extends ThreadedLoop
     public void update()
     {
         for(UpdateJob loopSystem : loopNodes) // these should ideally run sequentially, they do not
-            loopSystem.update();
+        {
+            Thread thread = new Thread(loopSystem);
+            thread.start();
+            try
+            {
+                thread.join();
+            } catch (InterruptedException e)
+            {
+                thread.interrupt();
+                throw new RuntimeException(e);
+            }
+        }
     }
     public void addLoopNode(UpdateJob job) { loopNodes.add(job); }
     public void insertLoopNode(UpdateJob job, int index)
