@@ -1,10 +1,7 @@
 import loopSystem.UpdateManager;
-import loopSystem.jobs.PrintJob;
-import loopSystem.jobs.UpdateJob;
-
 public class Main
 {
-    public static void main(String[] args) throws InterruptedException // Because lazy
+    public static void main(String[] args)
     {
         UpdateManager loop = new UpdateManager(12,4); /// 0 based so 0-11
         for (int i = 0; i < 150; i++)
